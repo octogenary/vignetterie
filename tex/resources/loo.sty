@@ -1,0 +1,438 @@
+\usepackage[T1]{fontenc}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks, hyperfootnotes=false]{hyperref}
+\hypersetup{allcolors=Black, allbordercolors=white}
+
+
+
+\usepackage[left=1.8in, right=1.8in,top=1.2in,bottom=1.2in, twoside]{geometry}
+
+\usepackage{MnSymbol}
+\usepackage{MinionPro}
+
+\usepackage[kerning=true, tracking=true]{microtype}
+\SetExtraKerning
+{encoding = {*}}
+{
+	{:} = {100,0},
+	{;} = {100,0},
+	{?} = {25,25},
+	( = {0,5},
+	) = {5,0},
+}
+\SetTracking{encoding={*}, shape=sc}{15}
+
+\usepackage[classfont=caps, langfont=caps, disableredefinitions]{complexity}
+
+\renewcommand{\ComplexityFont}[1]{%
+	{\ensuremath{\textsc{\MakeLowercase{#1}}}}%extra {} makes everyone happy.
+}
+\renewcommand{\lang}[1]{{\ensuremath{\textsc{\MakeLowercase{#1}}}}}
+\renewcommand{\func}[1]{{\ensuremath{\textsc{\MakeLowercase{#1}}}}}
+
+\usepackage{ragged2e}
+
+\usepackage[british]{babel}
+%\usepackage[colorlinks]{hyperref}
+
+\hyphenation{Brough-ton}
+
+% FOOTNOTES
+
+\usepackage{dblfnote}
+\usepackage{fnpos}
+%\DFNinhibitcbreak
+\DFNalwaysdouble
+\makeFNbottom
+\setlength{\columnsep}{3em}
+
+\usepackage{scrextend}
+
+\makeatletter
+\def\footnoterule{\hrule \@width 0pt } % the \hrule is .4pt high
+\makeatother
+\deffootnote{0em}{0em}{\thefootnotemark.\hspace{0.2em}}
+
+
+% Utilities
+
+% Patching the bibliography for author-title
+
+\usepackage{xpatch}
+
+% Biblatex
+\usepackage[style=british]{csquotes}
+\usepackage[backend=biber, style=authortitle-ticomp, sorting=nyt, citereset=section,url=false,doi=false,isbn=false,ibidpage=true,backref=true]{biblatex}
+
+% URLs
+
+
+
+% Author-title
+
+\renewcommand{\mkbibnamefamily}[1]{\textsc{#1}} 
+\renewcommand{\newunitpunct}{\addcomma\space}
+
+\renewcommand{\UrlFont}{\sc}
+
+\renewcommand*{\mkibid}[1]{\mkbibemph{#1}}
+
+\DeclareFieldFormat{eprint:jstor}{%
+	\mkbibacro{JSTOR}\addcolon\space
+	\ifhyperref
+	{\href{https://www.jstor.org/stable/#1}{\nolinkurl{#1}}}
+	{\nolinkurl{#1}}}
+
+
+\DeclareSortingTemplate{nyt}{
+%	\sort{
+%		\field{presort}
+%	}
+%	\sort[final]{
+%		\field{sortkey}
+%	}
+%	\sort{
+%		\field{sortname}
+%		\field{author}
+%		\field{editor}
+%		\field{translator}
+%		\field{shorttitle}
+%		\field{title}
+%	}
+%	\sort{
+%		\field{sortyear}
+%		\field{year}
+%	}
+	\sort{
+%		\field{sorttitle}
+		\field{author}
+		\field{shorttitle}
+		\field{title}
+	}
+	\sort{
+		\field{volume}
+		\literal{0}
+	}
+}
+
+\setlength{\bibhang}{3em}
+\renewcommand*{\postnotedelim}{\addcolon\space}
+%\DeclareDelimFormat[parencite]{multinamedelim}{\addsemicolon\space}
+%\DeclareDelimFormat[parencite]{finalnamedelim}{\addsemicolon\space}
+
+% Backrefs
+
+\newcounter{backref}
+
+\makeatletter
+
+\patchcmd{\blx@addbackref@i}{\thepage}{%
+	\blx@imc@iffieldundef{postnote}{\textasteriskcentered}{\abx@field@postnote} [\string\hyperlink{backref.\thebackref}{\thesubsection}]}{}{}
+
+\xpretocmd{\blx@citeprint}{\stepcounter{backref}\Hy@raisedlink{\hypertarget{backref.\thebackref}{}}}
+
+
+\DeclareListFormat*{pageref}{\usebibmacro{list:delim}{#1}%
+	#1\isdot\usebibmacro{list:andothers}}
+
+\DefineBibliographyStrings{english}{%
+	backrefpage             = {passage cited:},
+	backrefpages            = {passages cited:},
+	page             = {},
+	pages            = {},
+} 
+
+
+%\patchcmd{\blx@biblistitem}{\csuse{blx@item@\blx@theenv}}{}
+
+%\defbibenvironment{mylist}
+%{\list{}{%
+%		\labelwidth\labelnumberwidth
+%		\labelsep\biblabelsep
+%		\leftmargin\labelwidth
+%		\advance\leftmargin\labelsep
+%		\itemsep\bibitemsep
+%		\parsep\bibparsep
+%		\def\makelabel##1{%
+%			\printfield[shorttitle]{label}%  <--- Use printfield with the appropriate format
+%			\hss}}}
+%{\endlist}
+%{\item}  
+
+\makeatother
+
+% Linebreaks
+
+\DeclareFieldFormat{postnote}{#1}
+
+\renewbibmacro*{postnote}{%
+	\iffieldundef{postnote}
+	{}
+	{\setunit{\printdelim{postnotedelim}\allowbreak}%
+		\printfield{postnote}}}   
+
+\AtBeginBibliography{
+	\xpretobibmacro{author}{\mkbibbold\bgroup}{}{}
+	\xapptobibmacro{author}{\egroup}{}{}
+	\xpretobibmacro{bbx:editor}{\mkbibbold\bgroup}{}{}
+	\xapptobibmacro{bbx:editor}{\egroup}{}{}
+	
+	\DeclareFieldFormat{titlecase}{#1}
+	
+	\newbibmacro{string+doiurlisbn}[1]{%
+		\iffieldundef{doi}{%
+			\iffieldundef{url}{%
+				\iffieldundef{isbn}{%
+					\iffieldundef{issn}{%
+						#1%
+					}{%
+						\href{http://books.google.com/books?vid=ISSN\thefield{issn}}{#1}%
+					}%
+				}{%
+					\href{http://books.google.com/books?vid=ISBN\thefield{isbn}}{#1}%
+				}%
+			}{%
+				\href{\thefield{url}}{#1}%
+			}%
+		}{%
+			\href{http://dx.doi.org/\thefield{doi}}{#1}%
+		}%
+	}	
+	
+	\newbibmacro*{jlt}{%
+		\usebibmacro{string+doiurlisbn}{\printtext[title]{%
+				\printfield[titlecase]{title}%
+				\setunit{\subtitlepunct}%
+				\printfield[titlecase]{subtitle}}}%	
+		\newunitpunct%
+	}
+	
+	\newbibmacro*{jltb}{%
+		\usebibmacro{string+doiurlisbn}{\mkbibbold{\printtext[title]{%
+					\printfield[titlecase]{title}%
+					\setunit{\subtitlepunct}%
+					\printfield[titlecase]{subtitle}}}}%	
+		\newunitpunct%
+	}	
+	
+	\newbibmacro*{slt}{%
+		\mkbibbold{\printtext[title]{\printfield[titlecase]{shorttitle}}}{\,=\,}\setunit{}%
+		\usebibmacro{jlt}
+	}
+	
+	\renewbibmacro*{title}{%
+		\iffieldundef{shorttitle}%
+		{\ifsingletitle%
+			{\usebibmacro{jlt}}%
+			{\usebibmacro{jltb}}%
+		}%
+		{\ifkeyword{primary}%
+			{\usebibmacro{slt}}%
+			{\ifsingletitle%
+				{\usebibmacro{jlt}}%
+				{\usebibmacro{slt}}%
+			}%
+		}%
+		\printfield{titleaddon}%
+	}
+	
+	\DeclareFieldFormat{shortitle}{\textsc{#1}}
+
+\citetrackerfalse
+
+
+%\let\blx@backref\@gobble
+%\let\abx@aux@backref\@gobblefive
+\boolfalse{backtracker}
+}
+
+% TITLES
+
+% Title overhangs
+
+\newlength\TitleOverhang
+\setlength\TitleOverhang{3em}
+
+\newcommand\overhang[1]{%
+	\llap{\makebox[\TitleOverhang][l]{#1}}%
+}
+
+
+% Number sections independently of chapters
+
+\usepackage{chngcntr}
+%\counterwithout{section}{chapter}\parskip
+
+% Title formatting
+
+\usepackage{titlesec}
+
+
+\makeatletter 
+\newcommand\mynobreakpar{\par\nobreak\@afterheading} 
+\makeatother
+
+%\renewcommand{\thechapter}{\textsc{\roman{chapter}}}
+
+%\titleformat{\chapter}{\large\bfseries}{\overhang{{\thechapter}}}{0pt}{} 
+\titleformat{\section}{\normalfont\bfseries}{\overhang{{\thesection}}}{0pt}{}
+\titleformat{\subsection}{\normalfont\itshape}{\overhang{{\thesubsection}}}{0pt}{}
+\titleformat{\subsubsection}[runin]{\normalfont\itshape}{\makebox[\TitleOverhang][l]{\thesubsubsection}}{0em}{}[\hspace{1em}\setlength{\parindent}{3em}]
+%\titleformat{\subsubsection}{\normalfont\itshape}{\makebox[\TitleOverhang][l]{\thesubsection}}{0pt}{}
+% NB \backreftarget ensures that the backrefs go to the right place.
+
+\titlespacing*{\section}{0em}{0.5\baselineskip}{0.5\baselineskip}
+\titlespacing*{\subsection}{0em}{0\baselineskip}{0\baselineskip}
+\titlespacing*{\subsubsection}{0em}{0\baselineskip}{0em}
+
+% Table of contents
+
+\usepackage{tocloft}
+%\renewcommand{\cftchapindent}{-3em}
+%\renewcommand{\cftchapnumwidth}{3em}
+\renewcommand{\cftsecindent}{0em}
+\renewcommand{\cftsecnumwidth}{3em}
+
+\makeatletter
+\renewcommand{\@cftmaketoctitle}{\chapter*{Contents}}
+\makeatother
+
+% QUOTATION
+\usepackage{changepage}
+\usepackage{calc}
+
+\renewenvironment{quote}{%
+	
+	\setlength{\parindent}{\parindent-3em}
+	\begin{adjustwidth}{3em}{0em}
+		\small
+	}{
+	\end{adjustwidth}
+		\normalsize
+	\setlength{\parindent}{\parindent+3em}
+}
+
+\renewenvironment{quote}{%
+	
+	\setlength{\parindent}{\parindent-3em}
+	\begin{adjustwidth}{3em}{0em}
+		\small
+	}{
+	\end{adjustwidth}
+	\normalsize
+	\setlength{\parindent}{\parindent+3em}
+}
+
+
+% HEADERS AND FOOTERS
+
+
+\usepackage{fancyhdr}
+
+\newcommand{\negphantom}[1]{\settowidth{\dimen0}{#1}\hspace*{-\dimen0}}
+
+\pagestyle{fancy}
+%\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+
+\renewcommand{\sectionmark}[1]{\markboth{#1}{#1}}
+\renewcommand{\subsectionmark}[1]{\markright{#1}}
+
+
+\fancypagestyle{main}{
+	\fancyhead{}
+	\fancyhead[LE]{\hspace{-3em}\makebox[3em][l]{\thepage}\makebox[10em][l]{\emph{\leftmark}}}
+	\fancyhead[RO]{{\emph{\rightmark}}\makebox[3em][r]{\thepage}\hspace{-3em}}
+	\fancyfoot{} % clear all footer fields
+	\renewcommand{\headrulewidth}{0pt}
+	\renewcommand{\footrulewidth}{0pt}
+}
+
+% References to sections
+
+
+% parskip &c
+
+\setlength{\parskip}{0.5\baselineskip}
+\setlength{\RaggedRightParindent}{3em}
+
+\usepackage[all]{nowidow}
+
+\usepackage{enumitem}
+\setlist{
+	itemsep=0em,
+	parsep=0.2em,
+	topsep=0em,
+	partopsep=0em,
+	align=left,
+	labelwidth=3em,
+	labelsep=0em,
+	itemindent=3em,
+}
+%\setenumerate[1]{
+%	leftmargin=0em,
+%	label={{\arabic{enumi}}},
+%	font=\bfseries,
+%	before=\bfseries,
+%	itemsep=1em
+%}
+
+
+\setitemize[1]{
+	parsep=0.4em,
+	itemindent=3em,
+	leftmargin=0em,
+	itemsep=0em
+}
+
+
+\setenumerate[1]{
+	itemindent=0em,
+	leftmargin=3em,
+	parsep=0.4em,
+}
+\setenumerate[3]{
+	leftmargin=0em,
+	parsep=0.4em,
+	itemindent=3em,
+	ref={\P~{\thesection.\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}}},
+	label={\textsc{\roman{enumiii}}},
+	before=\setlength{\listparindent}{3em}\mynobreakpar
+}
+\setenumerate[4]{
+	leftmargin=3em,
+	parsep=0.4em,
+	itemindent=3em,
+	ref={{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}.\textsc{\roman{enumiv}}}},
+	label={{\textsc{\roman{enumiv}}}},
+	before=\setlength{\listparindent}{3em}
+}
+
+% THEOREMS
+
+\usepackage{amsthm}
+
+\newtheoremstyle{loo}%
+	{\parskip}% space below
+	{0em}% space above
+	{} % body font
+	{\parindent} % indent
+	{\itshape} % theorem head font
+	{.} % punctuation after theorem head
+	{ }
+	{\hspace{-3em}\makebox[3em][l]{{\thmnumber{#2}}}\thmname{#1}\thmnote{ (#3)}}
+
+\theoremstyle{loo}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{result}[theorem]{Result}
+
+\makeatletter
+\renewenvironment{proof}[1][\proofname]{%
+	\begin{enumerate}[nosep,leftmargin=0em,itemindent=3em,parsep=\parskip,listparindent=\RaggedRightParindent]
+		\item[]	\pushQED{\qed}\emph{#1}. \ignorespaces
+}{%
+	\popQED\end{enumerate}%
+}
+\makeatother
