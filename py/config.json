@@ -1,0 +1,15 @@
+{
+    "vignettes_root": "../tex/vignettes/",
+    "resources_root": "../tex/resources/",
+    "output_root": "../output/",
+    "build": "../build/",
+    "standalone_output": "build/standalones/",
+    "vignette_output": "vignettes/",
+    "tag_output": "etiquettes/",
+    "build_file": "../config/build.mk4",
+    "make4ht_config": "../config/main.cfg",
+    "to_copy": [
+        ["../config/main.css", "../output/main.css"]
+    ],
+    "apropos": "../top/apropos.html"
+}

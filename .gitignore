@@ -1,1 +1,4 @@
 py/env
+build/
+output/
+py/main.log
