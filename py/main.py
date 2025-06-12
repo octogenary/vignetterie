@@ -7,6 +7,11 @@ from textwrap import dedent
 import shutil
 import sys
 import re
+import locale
+
+locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
+env = os.environ.copy()
+env["LC_TIME"] = "fr_FR.UTF-8"  # ou "fr_FR.utf8" selon votre système
 
 typeface = ""
 
@@ -38,10 +43,11 @@ class Vignette(object):
                 "git",
                 "log",
                 r"--pretty=format:'<p>%an (%ad): %s</p>",
-                r"--date=format:%d/%m/%Y",
+                r"--date=format:%d %B %Y",
                 f"{config.vignettes_root}{name}.tex",
             ],
-            text=True
+            text=True,
+            env=env
         )[1:]
         self.raw_date = os.path.getmtime(f"{config.vignettes_root}{name}.tex")
         self.date = datetime.utcfromtimestamp(int(self.raw_date)).strftime("%-d %B %Y")
