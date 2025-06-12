@@ -72,7 +72,7 @@ a[href]:not([href=""]):not(:empty)::after {
 }
 
 .nobr {
-  white-space: nowrap;
+	white-space: nowrap;
 }
 
 header {
@@ -89,4 +89,9 @@ header {
 	width: 0.2em;
 	display: inline-block;
 	text-indent: 0em;
+}
+
+.plainlist {
+	list-style: none;
+	padding-left: 0;
 }

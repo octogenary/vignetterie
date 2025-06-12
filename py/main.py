@@ -20,13 +20,13 @@ typeface = ""
 
 
 def tidy(html: str):
-    return etree.tostring(lxml_html.fromstring(html), pretty_print=True).decode()
+    return html
 
 
 def link_replace(html: str):
     return re.sub(
         r"\n\s*",
-        r"",
+        r"\n",
         re.sub(
             r"(<span class='ec-[^']+'>[^>]+</span>)<span class='nowidth'>",
             r"\1<span class='postitalicnowidth'>",
@@ -53,13 +53,13 @@ class Vignette(object):
             [
                 "git",
                 "log",
-                r"--pretty=format:'<p>%an (%ad): %s</p>",
+                r"--pretty=format:<li>%an (%ad): %s</li>",
                 r"--date=format:%d %B %Y",
                 f"{config.vignettes_root}{name}.tex",
             ],
             text=True,
             env=env,
-        )[1:]
+        )
         self.raw_date = os.path.getmtime(f"{config.vignettes_root}{name}.tex")
         self.date = datetime.utcfromtimestamp(int(self.raw_date)).strftime("%-d %B %Y")
         self.time = datetime.utcfromtimestamp(int(self.raw_date)).strftime(
@@ -153,7 +153,9 @@ class Vignette(object):
                 <h3>Étiquettes.</h3>
                 <p>{tags}.</p>
                 <h3>Mises à jour.</h3>
+                <ul class="plainlist">
                 {self.log}
+                </ul>
                 </main>
                 </body>
                 </html>"""
@@ -277,7 +279,7 @@ class Vignetterie(object):
                     <h2>Étiquettes.</h2>
                     <p>{tags}</p>
                     <h2>Vignettes ({len(self.all)}).</h2>
-                    <ul style="list-style: none; padding-left: 0;">
+                    <ul class="plainlist">
                     {all_posts}
                     </ul>
                     </main>
