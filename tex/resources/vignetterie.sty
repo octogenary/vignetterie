@@ -1,29 +1,28 @@
-\usepackage[utf8x]{inputenc}
 \usepackage{hyperref}
 
 
 % Utilities
 
-% Patching the bibliography for author-title
-
-\usepackage{xpatch}
 
 % Biblatex
+\usepackage[british]{babel}
 \usepackage[style=british]{csquotes}
-\usepackage[backend=biber, style=authortitle-ticomp, sorting=nyt, ibidpage=true,backref=false]{biblatex}
+\usepackage[
+	backend=biber,
+	style=authortitle-ticomp,
+	sorting=nyt,
+	ibidpage=true,
+	backref=false,
+	url=false,
+	doi=false,
+	isbn=false
+]{biblatex}
 
 \renewcommand{\mkbibnamefamily}[1]{\textsc{#1}} 
-
 \renewcommand{\UrlFont}{\sc}
-
 \renewcommand*{\mkibid}[1]{\mkbibemph{#1}}
-
-\DeclareFieldFormat{eprint:jstor}{%
-	\mkbibacro{JSTOR}\addcolon\space
-	\ifhyperref
-	{\href{https://www.jstor.org/stable/#1}{\nolinkurl{#1}}}
-	{\nolinkurl{#1}}}
-
+\renewbibmacro{in:}{}
+\renewcommand*{\newunitpunct}{\addcomma\space}
 
 \DeclareSortingTemplate{nyt}{
 %	\sort{
@@ -56,53 +55,83 @@
 	}
 }
 
-\AtBeginBibliography{
-	% \xpretobibmacro{author}{\mkbibbold\bgroup}{}{}
-	% \xapptobibmacro{author}{\egroup}{}{}
-	% \xpretobibmacro{bbx:editor}{\mkbibbold\bgroup}{}{}
-	% \xapptobibmacro{bbx:editor}{\egroup}{}{}
-	\renewcommand{\mkbibnamefamily}[1]{\textsc{#1}}
+\AtEveryBibitem{%
+	\iffieldequalstr{entrysubtype}{newspaper}{}{%
+		\clearfield{month}%
+		\clearfield{day}%
+	}%
+	\iffieldequalstr{eprinttype}{jstor}{%
+		\clearfield{eprint}%
+		\clearfield{eprinttype}%
+		}{}%
+}
 
-	\newbibmacro{string+doiurlisbn}[1]{#1}
+\DefineBibliographyStrings{english}{%
+	page             = {},
+	pages            = {},
+} 
+
+
+\AtBeginBibliography{
+	\DeclareFieldFormat{titlecase}{#1}
+	
+	\newbibmacro{string+doiurlisbn}[1]{%
+		\iffieldundef{doi}{%
+			\iffieldundef{url}{%
+				\iffieldundef{isbn}{%
+					#1
+				}{%
+					\href{https://openlibrary.org/search?q=\thefield{isbn}}{#1}%
+				}%
+			}{%
+				\href{\thefield{url}}{#1}%
+			}%
+		}{%
+			\href{http://dx.doi.org/\thefield{doi}}{#1}%
+		}%
+	}	
 	
 	\newbibmacro*{jlt}{%
 		\usebibmacro{string+doiurlisbn}{\printtext[title]{%
-		\printfield[titlecase]{title}%
-		\printfield[titlecase]{subtitle}}}%	
+				\printfield[titlecase]{title}%
+				\setunit{\subtitlepunct}%
+				\printfield[titlecase]{subtitle}}}%	
+		\newunitpunct%
 	}
-
+	
 	\newbibmacro*{jltb}{%
-	\usebibmacro{string+doiurlisbn}{\mkbibbold{\printtext[title]{%
-			\printfield[titlecase]{title}%
-			\printfield[titlecase]{subtitle}}}}%	
+		\usebibmacro{string+doiurlisbn}{{\printtext[title]{%
+					\printfield[titlecase]{title}%
+					\setunit{\subtitlepunct}%
+					\printfield[titlecase]{subtitle}}}}%	
+		\newunitpunct%
 	}	
-
+	
 	\newbibmacro*{slt}{%
-		\mkbibbold{\printtext[title]{\printfield[titlecase]{shorttitle}}}{\,=\,}%
-		\usebibmacro{jlt}%
+		{\printtext[title]{\printfield[titlecase]{shorttitle}}}{\,=\,}\setunit{}%
+		\usebibmacro{jlt}
 	}
 	
 	\renewbibmacro*{title}{%
-		\unspace
 		\iffieldundef{shorttitle}%
+		{\ifsingletitle%
+			{\usebibmacro{jlt}}%
+			{\usebibmacro{jltb}}%
+		}%
+		{\ifkeyword{primary}%
+			{\usebibmacro{slt}}%
 			{\ifsingletitle%
 				{\usebibmacro{jlt}}%
-				{\usebibmacro{jltb}}%
-			}%
-			{\ifkeyword{primary}%
 				{\usebibmacro{slt}}%
-				{\ifsingletitle%
-					{\usebibmacro{jlt}}%
-					{\usebibmacro{slt}}%
-				}%
 			}%
+		}%
 		\printfield{titleaddon}%
 	}
-
+	
 	\DeclareFieldFormat{shortitle}{\textsc{#1}}
 }
 
-% THEOREMS
+% % THEOREMS
 
 \usepackage{amsthm}
 

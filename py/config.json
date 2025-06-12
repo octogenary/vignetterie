@@ -3,7 +3,7 @@
     "resources_root": "../tex/resources/",
     "output_root": "../output/",
     "build": "../build/",
-    "standalone_output": "build/standalones/",
+    "standalone_output": "../build/standalones/",
     "vignette_output": "vignettes/",
     "tag_output": "etiquettes/",
     "build_file": "../config/build.mk4",

@@ -1,0 +1,39 @@
+A rough sketch of a BPhil thesis.
+
+philo, linguistics, Chomsky, learning theory, poverty of stimulus, nativism, empiricism, rationalism, en cours, vulgarisation
+===
+\textsc{very brief abstract.} Philosophers and linguists have appealed to computational and statistical learning theory in debates about the nature of knowledge of language and language itself, concerning innateness, universal grammar, and the poverty of the stimulus \parencite{nowak2001,clark2010, clark2011, clark2012, clark2013}. At this stage, I envisage an argument along the following lines.
+\begin{enumerate}
+\item Existing learning-theoretic frameworks justifying these arguments should be read as idealisations.
+\item In the light of considerations from philosophy of science, we can classify these idealisations as intended to reveal the tradeoffs and relations between different features of learning (e.g. the sophistication of the languages learned, the nature of the linguistic stimulus, and the computational resources available to the learner).
+\item In that form, they are not very good idealisations. They make the learnability of language more sensitive to minor changes to linguistic stimulus and requirements on learning than is plausible. Such an argument can be made from the existing body of results in the literature, but I think can be made robust by proving a few more slight variants of existing results.
+\item The problem is the uncritical borrowing of a habit from computer science and engineering: that of defining difficulty with respect to unboundedly large inputs (e.g. unboundedly large languages). 
+\item The flaws in these idealisations can be corrected. I propose to examine what conclusions we can draw about knowledge of language from more careful appeals to learning theory.
+\end{enumerate}
+I have a relatively clear idea of the direction the first four points would take; the fifth is less clear. Under point (3) and perhaps (4) I hope to show a few new results of philosophical interest.
+\section*{A longer explanation.}
+\begin{quote}
+First come I. My name is Jowett.\\
+There is no knowledge, but I know it.\\
+I am Master of this College.\\
+What I don't know isn't knowledge.
+\end{quote}
+
+The following principles, loosely stated, may seem almost to be nostrums. (1) Whatever language is, whatever it is to know language, and whatever it is to learn a language do not preclude our learning it as children. (2) A (philosophical, scientific,…) theory of language is \emph{ceteris paribus} worse if it suggests that language acquisition would be \emph{too hard} to be accomplished, and, conversely, is \emph{ceteris paribus} better if it suggests that language acquisition is feasible.
+
+\begin{small}
+Aside: It may be legitimate to idealise in a way that suggests we cannot learn language, if the purpose of the idealisation is to come to understand linguistic phenomena other than acquisition.
+\end{small}
+
+I propose to examine the literature in philosophy, linguistics, and cognitive science that concerns arguments of the following form \parencite[114]{nowak2001}.
+\begin{quote}
+Children have to deduce the rules of their native language from sample sentences they receive from their parents and others. This information is insufficient for uniquely determining the underlying grammatical principles. Linguists call this phenomenon the ‘poverty of stimulus’ or the ‘paradox of language acquisition’. The proposed solution is universal grammar.
+\end{quote}
+
+This literature develops from two sources: first, \textcite{chomsky1986}’s work on poverty of the stimulus; and, second, formal approaches from theoretical computer science to developing that argument \parencite[also beginning with the formal work of][and later marshalled into the Chomskyan tradition]{gold1967}. Some \parencite[e.g.][]{nowak2001} argue in favour of universal grammar, others \parencites[e.g.][]{clark2010}{clark2011}{clark2012}{clark2013} against.
+
+I propose to identify underlying idealising assumptions common to all sides in this literature that follow from their borrowing arguments from theoretical computer science. Following common practice in computer science and engineering, what counts as too hard is defined in the usual terms of computer science, and so with respect to inputs of unbounded size. For example, given a list of \(n\) elements, as a function of \(n\), how many comparisons and swaps are needed to sort it? Similarly, given a grammar of a certain size, as a function of that size, how many linguistic stimuli are needed to learn it? What if a certain (arbitrarily small) rate of error or risk of failure to learn is permitted? And how much computation, given those linguistic stimuli, is necessary?
+
+Considered as idealisations, formal approaches’ principal purpose is to accurately reflect the structural relations and tradeoffs between different features of language acquisition \parencite[close to the `minimal idealisation' of][]{weisberg2007}: cognitive difficulty, the rate of linguistic error, the availability of corrective linguistic stimulus, and so on. I shall argue that a considerable number of existing approaches, in this respect, are flawed; learnability results are too sensitive to what are \emph{prima facie} unimportant features, and so are poor idealisations. This can be attributed to the habit, borrowed somewhat uncritically from computer science, of defining difficulty with respect to inputs of unbounded size.
+
+That argument suggests a subtler understanding of the results from theoretical computer science on which they rely. I propose therefore in the later part of my thesis to examine what a different approach to formal idealisations about language acquisition might suggest about knowledge of language and language itself.

@@ -1,0 +1,74 @@
+
+	@font-face {
+		font-family: Alegreya;
+		font-weight: 400;
+		src: url('https://fonts.gstatic.com/s/alegreya/v35/4UacrEBBsBhlBjvfkQjt71kZfyBzPgNG9hUI-aCisSGVrw.woff2') format('woff2')
+	}
+
+	body {
+		margin: 2em auto;
+		max-width: 60ch;
+		padding: 0 .62em;
+		font-family: 'Alegreya', sans-serif;
+		font-size: 16pt;
+		line-height: 1.25;
+		text-align: left;
+		color: #202020;
+		background-color: #EEDDCC;
+	}
+
+	h1 {
+		font-size: 140%;
+	}
+
+	h2 {
+		font-size: 120%;
+	}
+
+	h3 {
+		font-size: 110%;
+	}
+
+	h4 {
+		font-size: 105%;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4 {
+		text-align: left;
+		font-weight: normal;
+	}
+
+	a {
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+
+		-ms-word-break: break-all;
+		word-break: break-word;
+
+		-ms-hyphens: auto;
+		-moz-hyphens: auto;
+		-webkit-hyphens: auto;
+		hyphens: auto;
+
+		color: #606060;
+		text-decoration: none;
+	}
+
+	a[href]:not([href=""]):not(:empty)::before {
+		position: relative;
+		content: "°";
+		top: -0.10em;
+		color: #008080;
+	}
+
+	header {
+		padding: 0em 0em 1em 0em;
+    }
+
+    .nowidth {
+        display: inline-block;
+        width: 0em;
+    }

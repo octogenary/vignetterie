@@ -1,67 +1,87 @@
-	body {
-		margin: 2em auto;
-		max-width: 60ch;
-		padding: 0 .62em;
-		font-family: 'Alegreya', sans-serif;
-		font-size: 16pt;
-		line-height: 1.25;
-		text-align: left;
-		color: #202020;
-		background-color: #EEDDCC;
-	}
+/* css.sty */
 
-	h1 {
-		font-size: 140%;
-	}
+@font-face {
+	font-family: Alegreya;
+	font-weight: 400;
+	src: url('https://fonts.gstatic.com/s/alegreya/v35/4UacrEBBsBhlBjvfkQjt71kZfyBzPgNG9hUI-aCisSGVrw.woff2') format('woff2')
+}
 
-	h2 {
-		font-size: 120%;
-	}
+body {
+	margin: 2em auto;
+	max-width: 60ch;
+	padding: 0 .62em;
+	font-family: 'Alegreya', sans-serif;
+	font-size: 16pt;
+	line-height: 1.25;
+	text-align: left;
+	color: #202020;
+	background-color: #EEDDCC;
+}
 
-	h3 {
-		font-size: 110%;
-	}
+h1 {
+	font-size: 140%;
+}
 
-	h4 {
-		font-size: 105%;
-	}
+h2 {
+	font-size: 120%;
+}
 
-	h1,
-	h2,
-	h3,
-	h4 {
-		text-align: left;
-		font-weight: normal;
-	}
+h3 {
+	font-size: 110%;
+}
 
-	a {
-		overflow-wrap: break-word;
-		word-wrap: break-word;
+h4 {
+	font-size: 105%;
+}
 
-		-ms-word-break: break-all;
-		word-break: break-word;
+h1,
+h2,
+h3,
+h4 {
+	text-align: left;
+	font-weight: normal;
+}
 
-		-ms-hyphens: auto;
-		-moz-hyphens: auto;
-		-webkit-hyphens: auto;
-		hyphens: auto;
+a {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
 
-		color: #606060;
-		text-decoration: none;
-	}
+	-ms-word-break: break-all;
+	word-break: break-word;
 
+	-ms-hyphens: auto;
+	-moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	hyphens: auto;
 
-	a::after {
-		position: relative;
-		content: "°";
-		top: -0.10em;
-		color: #008080;
-	}
+	color: #606060;
+	text-decoration: none;
 
-
-	header {
-		padding: 0em 0em 1em 0em;
-	}
+	white-space: normal;
+}
 
 
-	/* css.sty */
+a[href]:not([href=""]):not(:empty)::after {
+	position: relative;
+	content: "°";
+	color: #008080;
+	white-space: nowrap;
+}
+
+
+
+header {
+	padding: 0em 0em 1em 0em;
+}
+
+.nowidth {
+	width: 0em;
+	display: inline-block;
+	text-indent: 0em;
+}
+
+.postitalicnowidth {
+	width: 0.2em;
+	display: inline-block;
+	text-indent: 0em;
+}

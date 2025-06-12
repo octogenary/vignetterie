@@ -2,3 +2,6 @@ py/env
 build/
 output/
 py/main.log
+scratchpad/
+py/__pycache__
+py/tinkering.*

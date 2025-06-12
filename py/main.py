@@ -6,34 +6,38 @@ from python_json_config import ConfigBuilder, Config
 from textwrap import dedent
 import shutil
 import sys
+import re
+
+typeface = ""
+
+
+def link_replace(html: str):
+    return re.sub(
+        r"(<span class='ec-[^']+'>[^>]+</span>)<span class='nowidth'>",
+        r"\1<span class='postitalicnowidth'>",
+        re.sub(
+            r"</a>([.,]+)",
+            r"<span class='nowidth'>\1</span></a>",
+            re.sub(
+                r"([.,]+)</a>",
+                r"<span class='nowidth'>\1</span></a>",
+                re.sub(r"(<a id='x[\d-]+'></a>)([,.])", r"\2\1", html),
+            ),
+        ).replace("</em><span class='nowidth'>", "</em><span class='postitalicnowidth'>")
+    )
 
 
 class Vignette(object):
     def __init__(self, parent: "Vignetterie", name: str, config: Config):
-        print(f"Starting {name}.")
+        parent.all.append(self)
         self.name = name
-        self.raw_date = (
-            subprocess.run(
-                [
-                    "git",
-                    "log",
-                    "-1",
-                    """--pretty="%ct""" "",
-                    f"{config.vignettes_root}{name}.tex",
-                ],
-                stdout=subprocess.PIPE,
-            )
-            .stdout.decode("utf-8")[1:]
-            .strip()
-        )
-        self.date = (
-            datetime.utcfromtimestamp(int(self.raw_date)).strftime(
-                "%H.%M temps universel coordonné, %-d %B %Y"
-            )
-            if self.raw_date
-            else "date inconnue"
+        self.raw_date = os.path.getmtime(f"{config.vignettes_root}{name}.tex")
+        self.date = datetime.utcfromtimestamp(int(self.raw_date)).strftime("%-d %B %Y")
+        self.time = datetime.utcfromtimestamp(int(self.raw_date)).strftime(
+            "%H.%M temps universel coordonné"
         )
         os.makedirs(config.build, exist_ok=True)
+        os.makedirs(config.standalone_output, exist_ok=True)
         with open(f"{config.vignettes_root}{name}.tex") as source_file, open(
             f"{config.build}{name}.tex", "w"
         ) as standalone_tex_file:
@@ -55,25 +59,32 @@ class Vignette(object):
             )
             standalone_tex_file.write(standalone_tex)
         try:
-            if (
-                "-r" in sys.argv
-                or not self.raw_date
-                or self.raw_date
-                and int(self.raw_date)
-                > os.path.getmtime(
-                    f"{config.output_root}{config.vignette_output}{name}.html"
-                )
+            if "-r" in sys.argv or os.path.getmtime(
+                f"{config.vignettes_root}{name}.tex"
+            ) > os.path.getmtime(
+                f"{config.output_root}{config.vignette_output}{name}.html"
             ):
+                subprocess.Popen(f"rm {config.build}{name}.*")
                 subprocess.Popen(
                     f"make4ht -ul --build-file {config.build_file} "
                     f"--output-dir {config.standalone_output} "
                     f"--config {config.make4ht_config} "
                     f"--build-dir {config.build} "
-                    f"{config.build}{name}.tex ",
+                    f"{config.build}{name}.tex "
+                    " 'mathml,mathjax'",
                     shell=True,
                 ).wait()
-        except OSError:
-            pass
+        except OSError as e:
+            print(f"{name} to be generated for the first time.")
+            subprocess.Popen(
+                f"make4ht -ul --build-file {config.build_file} "
+                f"--output-dir {config.standalone_output} "
+                f"--config {config.make4ht_config} "
+                f"--build-dir {config.build} "
+                f"{config.build}{name}.tex "
+                " 'mathml'",
+                shell=True,
+            ).wait()
         os.makedirs(config.standalone_output, exist_ok=True)
         os.makedirs(f"{config.output_root}{config.vignette_output}", exist_ok=True)
         with open(f"{config.standalone_output}{name}.html") as original_html_file, open(
@@ -90,13 +101,15 @@ class Vignette(object):
                     for tag in self.tags
                 ]
             )
-            html = dedent(
-                f"""
+            html = link_replace(
+                (
+                    f"""
                 <!DOCTYPE html>
                 <html>
                 <head><title>{self.title}</title>
                 <meta charset="utf-8" />
                 <meta content='width=device-width,initial-scale=1' name='viewport' /> 
+                {typeface}
                 <link href='{name}.css' rel='stylesheet' type='text/css' /> 
                 </head>
                 <body>
@@ -108,10 +121,11 @@ class Vignette(object):
                 {html_body}
                 <h2>À propos.</h2>
                 <p>Étiquettes : {tags}.</p>
-                <p>Dernière mise à jour : {self.date}.</p>
+                <p>Dernière mise à jour : {self.time} {self.date}.</p>
                 </main>
                 </body>
                 </html>"""
+                )
             )
             html_output.write(html)
             css_output.write(original_css_file.read())
@@ -124,8 +138,8 @@ class Vignette(object):
 
 class Vignetterie(object):
     def __init__(self, config: Config):
-        subprocess.Popen("rm -rf ../output/*", shell=True)
         self.tags = {}
+        self.all = []
         self.config = config
         threads = [
             threading.Thread(target=Vignette, args=(self, path[:-4], config))
@@ -151,19 +165,22 @@ class Vignetterie(object):
 
     def generate_tag_page(self, tag: str):
         vignettes = self.tags[tag]
-        html_body = " · ".join(
+        html_body = " ·</nobr> ".join(
             [
-                f"<a href='../vignettes/{vignette.name}.html'>{vignette.title} ({vignette.date})</a>"
-                for vignette in vignettes
+                f"<a href='../vignettes/{vignette.name}.html'>{vignette.title}</a> <nobr>({vignette.date})"
+                for vignette in sorted(
+                    vignettes, key=lambda v: v.raw_date, reverse=True
+                )
             ]
         )
-        html = dedent(
+        html = link_replace(
             f"""
                 <!DOCTYPE html>
                 <html>
                 <head><title>{tag}</title>
                 <meta charset="utf-8" />
                 <meta content='width=device-width,initial-scale=1' name='viewport' /> 
+                {typeface}
                 <link href='../main.css' rel='stylesheet' type='text/css' /> 
                 </head>
                 <body>
@@ -172,6 +189,7 @@ class Vignetterie(object):
                 </header>
                 <main>
                 <h1>ce qui concerne : {tag}</h1>
+                <main>
                 {html_body}
                 </main>
                 </body>
@@ -188,19 +206,33 @@ class Vignetterie(object):
             f"{config.output_root}index.html", "w"
         ) as output:
             apropos = f.read()
-            tags = " · ".join(
+            all_posts = "\n".join(
                 [
-                    f"<a href='etiquettes/{tag.replace(' ', '-').lower()}.html'>{tag} ({len(self.tags[tag])})</a>"
-                    for tag in sorted(self.tags, key=lambda t: (-len(self.tags[t]), t.lower()))
+                    f"<li><a href='vignettes/{vignette.name}.html'>{vignette.title}</a> ({vignette.date})</li>"
+                    for vignette in sorted(
+                        self.all,
+                        key=lambda v: v.raw_date,
+                        reverse=True,
+                    )
                 ]
             )
-            html = dedent(
-                f"""
+            tags = " ·</nobr> ".join(
+                [
+                    f"<nobr><a href='etiquettes/{tag.replace(' ', '-').lower()}.html'>{tag}</a> ({len(self.tags[tag])})"
+                    for tag in sorted(
+                        self.tags, key=lambda t: (-len(self.tags[t]), t.lower())
+                    )
+                ]
+            )
+            html = link_replace(
+                dedent(
+                    f"""
                     <!DOCTYPE html>
                     <html>
                     <head><title>La Vignetterie.</title>
                     <meta charset="utf-8" />
                     <meta content='width=device-width,initial-scale=1' name='viewport' /> 
+                    {typeface}
                     <link href='main.css' rel='stylesheet' type='text/css' /> 
                     </head>
                     <body>
@@ -212,9 +244,14 @@ class Vignetterie(object):
                     {apropos}
                     <h2>Étiquettes.</h2>
                     {tags}
+                    <h2>Vignettes ({len(self.all)}).</h2>
+                    <ul style="list-style: none; padding-left: 0;">
+                    {all_posts}
+                    </ul>
                     </main>
                     </body>
                     </html>"""
+                )
             )
             output.write(html)
 
