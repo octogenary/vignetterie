@@ -8,6 +8,9 @@ import shutil
 import sys
 import re
 import locale
+from lxml import html as lxml_html, etree
+import random
+
 
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 env = os.environ.copy()
@@ -16,20 +19,28 @@ env["LC_TIME"] = "fr_FR.UTF-8"  # ou "fr_FR.utf8" selon votre système
 typeface = ""
 
 
+def tidy(html: str):
+    return etree.tostring(lxml_html.fromstring(html), pretty_print=True).decode()
+
+
 def link_replace(html: str):
     return re.sub(
-        r"(<span class='ec-[^']+'>[^>]+</span>)<span class='nowidth'>",
-        r"\1<span class='postitalicnowidth'>",
+        r"\n\s*",
+        r"",
         re.sub(
-            r"</a>([.,]+)",
-            r"<span class='nowidth'>\1</span></a>",
+            r"(<span class='ec-[^']+'>[^>]+</span>)<span class='nowidth'>",
+            r"\1<span class='postitalicnowidth'>",
             re.sub(
-                r"([.,]+)</a>",
+                r"</a>([.,]+)",
                 r"<span class='nowidth'>\1</span></a>",
-                re.sub(r"(<a id='x[\d-]+'></a>)([,.])", r"\2\1", html),
+                re.sub(
+                    r"([.,]+)</a>",
+                    r"<span class='nowidth'>\1</span></a>",
+                    re.sub(r"(<a id='x[\d-]+'></a>)([,.])", r"\2\1", html),
+                ),
+            ).replace(
+                "</em><span class='nowidth'>", "</em><span class='postitalicnowidth'>"
             ),
-        ).replace(
-            "</em><span class='nowidth'>", "</em><span class='postitalicnowidth'>"
         ),
     )
 
@@ -47,7 +58,7 @@ class Vignette(object):
                 f"{config.vignettes_root}{name}.tex",
             ],
             text=True,
-            env=env
+            env=env,
         )[1:]
         self.raw_date = os.path.getmtime(f"{config.vignettes_root}{name}.tex")
         self.date = datetime.utcfromtimestamp(int(self.raw_date)).strftime("%-d %B %Y")
@@ -119,12 +130,13 @@ class Vignette(object):
                     for tag in self.tags
                 ]
             )
-            html = link_replace(
+            raw_html = link_replace(
                 (
                     f"""
                 <!DOCTYPE html>
                 <html>
-                <head><title>{self.title}</title>
+                <head>
+                <title>{self.title}</title>
                 <meta charset="utf-8" />
                 <meta content='width=device-width,initial-scale=1' name='viewport' /> 
                 {typeface}
@@ -147,7 +159,7 @@ class Vignette(object):
                 </html>"""
                 )
             )
-            html_output.write(html)
+            html_output.write(tidy(raw_html))
             css_output.write(original_css_file.read())
         for tag in self.tags:
             parent.tag_vignette(self, tag)
@@ -219,7 +231,7 @@ class Vignetterie(object):
             f"{config.output_root}{config.tag_output}{tag.replace(' ', '-').lower()}.html",
             "w",
         ) as f:
-            f.write(html)
+            f.write(tidy(html))
 
     def generate_index(self):
         with open(config.apropos) as f, open(
@@ -236,9 +248,9 @@ class Vignetterie(object):
                     )
                 ]
             )
-            tags = " ·</nobr> ".join(
+            tags = "".join(
                 [
-                    f"<nobr><a href='etiquettes/{tag.replace(' ', '-').lower()}.html'>{tag}</a> ({len(self.tags[tag])})"
+                    f"<a href='etiquettes/{tag.replace(' ', '-').lower()}.html'>{tag}</a><span class='nobr'> ({len(self.tags[tag])}) · </span>"
                     for tag in sorted(
                         self.tags, key=lambda t: (-len(self.tags[t]), t.lower())
                     )
@@ -263,7 +275,7 @@ class Vignetterie(object):
                     <h2>À propos.</h2>
                     {apropos}
                     <h2>Étiquettes.</h2>
-                    {tags}
+                    <p>{tags}</p>
                     <h2>Vignettes ({len(self.all)}).</h2>
                     <ul style="list-style: none; padding-left: 0;">
                     {all_posts}
@@ -273,7 +285,7 @@ class Vignetterie(object):
                     </html>"""
                 )
             )
-            output.write(html)
+            output.write(tidy(html))
 
     def __str__(self):
         return "Vignetterie"
