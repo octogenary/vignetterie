@@ -23,7 +23,9 @@ def link_replace(html: str):
                 r"<span class='nowidth'>\1</span></a>",
                 re.sub(r"(<a id='x[\d-]+'></a>)([,.])", r"\2\1", html),
             ),
-        ).replace("</em><span class='nowidth'>", "</em><span class='postitalicnowidth'>")
+        ).replace(
+            "</em><span class='nowidth'>", "</em><span class='postitalicnowidth'>"
+        ),
     )
 
 
@@ -31,6 +33,16 @@ class Vignette(object):
     def __init__(self, parent: "Vignetterie", name: str, config: Config):
         parent.all.append(self)
         self.name = name
+        self.log = subprocess.check_output(
+            [
+                "git",
+                "log",
+                r"--pretty=format:'<p>%an (%ad): %s</p>",
+                r"--date=format:%d/%m/%Y",
+                f"{config.vignettes_root}{name}.tex",
+            ],
+            text=True
+        )[1:]
         self.raw_date = os.path.getmtime(f"{config.vignettes_root}{name}.tex")
         self.date = datetime.utcfromtimestamp(int(self.raw_date)).strftime("%-d %B %Y")
         self.time = datetime.utcfromtimestamp(int(self.raw_date)).strftime(
@@ -120,8 +132,10 @@ class Vignette(object):
                 <h1>{self.title}</h1>
                 {html_body}
                 <h2>À propos.</h2>
-                <p>Étiquettes : {tags}.</p>
-                <p>Dernière mise à jour : {self.time} {self.date}.</p>
+                <h3>Étiquettes.</h3>
+                <p>{tags}.</p>
+                <h3>Mises à jour.</h3>
+                {self.log}
                 </main>
                 </body>
                 </html>"""
