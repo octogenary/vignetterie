@@ -23,10 +23,20 @@ def tidy(html: str):
     return html
 
 
+def replacer(match):
+    before = match.group(1)
+    after = match.group(2)
+    # If there's a space or tab in before or after, replace with a space
+    if len(before) + len(after) > 0:
+        return ' '
+    else:
+        return ''
+
+
 def link_replace(html: str):
     return re.sub(
-        r"\n\s*",
-        r"\n",
+        r"\s+\n\s+",
+        r"\b",
         re.sub(
             r"(<span class='ec-[^']+'>[^>]+</span>)<span class='nowidth'>",
             r"\1<span class='postitalicnowidth'>",
@@ -225,6 +235,7 @@ class Vignetterie(object):
                 <h1>ce qui concerne : {tag}</h1>
                 <main>
                 {html_body}
+                </nobr>
                 </main>
                 </body>
                 </html>"""
@@ -252,7 +263,7 @@ class Vignetterie(object):
             )
             tags = "".join(
                 [
-                    f"<a href='etiquettes/{tag.replace(' ', '-').lower()}.html'>{tag}</a><span class='nobr'> ({len(self.tags[tag])}) · </span>"
+                    f"<a href='etiquettes/{tag.replace(' ', '-').lower()}.html'>{tag}</a><span class='nobr'> ({len(self.tags[tag])}) ·</span><span> </span>"
                     for tag in sorted(
                         self.tags, key=lambda t: (-len(self.tags[t]), t.lower())
                     )
