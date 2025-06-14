@@ -10,8 +10,11 @@ import re
 import locale
 from lxml import html as lxml_html, etree
 import random
+from bs4 import BeautifulSoup, GuessedAtParserWarning
+import warnings
 
 
+warnings.filterwarnings("ignore", category=GuessedAtParserWarning)
 locale.setlocale(locale.LC_TIME, "fr_FR.UTF-8")
 env = os.environ.copy()
 env["LC_TIME"] = "fr_FR.UTF-8"  # ou "fr_FR.utf8" selon votre système
@@ -28,31 +31,34 @@ def replacer(match):
     after = match.group(2)
     # If there's a space or tab in before or after, replace with a space
     if len(before) + len(after) > 0:
-        return ' '
+        return " "
     else:
-        return ''
+        return ""
 
 
 def link_replace(html: str):
-    return re.sub(
-        r"\s+\n\s+",
-        r"\b",
+    return str(BeautifulSoup(
         re.sub(
-            r"(<span class='ec-[^']+'>[^>]+</span>)<span class='nowidth'>",
-            r"\1<span class='postitalicnowidth'>",
+            r"\s+\n\s+",
+            r"\b",
             re.sub(
-                r"</a>([.,]+)",
-                r"<span class='nowidth'>\1</span></a>",
+                r"(<span class='ec-[^']+'>[^>]+</span>)<span class='nowidth'>",
+                r"\1<span class='postitalicnowidth'>",
                 re.sub(
-                    r"([.,]+)</a>",
+                    r"</a>([.,]+)",
                     r"<span class='nowidth'>\1</span></a>",
-                    re.sub(r"(<a id='x[\d-]+'></a>)([,.])", r"\2\1", html),
+                    re.sub(
+                        r"([.,]+)</a>",
+                        r"<span class='nowidth'>\1</span></a>",
+                        re.sub(r"(<a id='x[\d-]+'></a>)([,.])", r"\2\1", html),
+                    ),
+                ).replace(
+                    "</em><span class='nowidth'>",
+                    "</em><span class='postitalicnowidth'>",
                 ),
-            ).replace(
-                "</em><span class='nowidth'>", "</em><span class='postitalicnowidth'>"
             ),
-        ),
-    )
+        )
+    ))
 
 
 class Vignette(object):
