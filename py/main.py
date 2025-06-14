@@ -76,6 +76,30 @@ class Vignette(object):
             text=True,
             env=env,
         )
+        self.git_date = subprocess.check_output(
+            [
+                "git",
+                "log",
+                "-1",
+                r"--pretty=format:%ad",
+                r"--date=format:%d %B %Y",
+                f"{config.vignettes_root}{name}.tex",
+            ],
+            text=True,
+            env=env
+        ) or "date inconnu"
+        self.git_unix_date = int(subprocess.check_output(
+            [
+                "git",
+                "log",
+                "-1",
+                r"--format=%at",
+                "--",
+                f"{config.vignettes_root}{name}.tex",
+            ],
+            text=True,
+            env=env
+        ) or "0")
         self.raw_date = os.path.getmtime(f"{config.vignettes_root}{name}.tex")
         self.date = datetime.utcfromtimestamp(int(self.raw_date)).strftime("%-d %B %Y")
         self.time = datetime.utcfromtimestamp(int(self.raw_date)).strftime(
@@ -217,9 +241,9 @@ class Vignetterie(object):
         vignettes = self.tags[tag]
         html_body = " ·</nobr> ".join(
             [
-                f"<a href='../vignettes/{vignette.name}.html'>{vignette.title}</a> <nobr>({vignette.date})"
+                f"<a href='../vignettes/{vignette.name}.html'>{vignette.title}</a> <nobr>({vignette.git_date})"
                 for vignette in sorted(
-                    vignettes, key=lambda v: v.raw_date, reverse=True
+                    vignettes, key=lambda v: v.git_unix_date, reverse=True
                 )
             ]
         )
@@ -259,10 +283,10 @@ class Vignetterie(object):
             apropos = f.read()
             all_posts = "\n".join(
                 [
-                    f"<li><a href='vignettes/{vignette.name}.html'>{vignette.title}</a> ({vignette.date})</li>"
+                    f"<li><a href='vignettes/{vignette.name}.html'>{vignette.title}</a> ({vignette.git_date})</li>"
                     for vignette in sorted(
                         self.all,
-                        key=lambda v: v.raw_date,
+                        key=lambda v: v.git_unix_date,
                         reverse=True,
                     )
                 ]
