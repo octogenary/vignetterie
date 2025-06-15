@@ -1,0 +1,22 @@
+LaTeX for philosophers.
+
+philo, LaTeX, typography
+===
+\begin{quote}
+A group of younger comrades have asked me to give my opinion in the press on problems relating to philosophy, particularly in reference to \LaTeX{} in philosophy. I am not a philosophical expert and, of course, cannot fully satisfy the request of the comrades. As to \LaTeX{} in philosophy…this is something directly in my field. I have therefore consented to answer a number of questions put by the comrades.
+\end{quote}
+
+(I’d like to think my writing this is slightly less megalomaniac than Stalin’s writing ‘Marxism and problems of linguistics’, and that the two requests directed to me are not the sign of an incipient cult of personality.)
+
+A first recommendation has nothing directly to do with \LaTeX{}: use \href{https://zotero.org}{Zotero}, an open-source reference management system. When reading most academic papers, inserting a reference is very quick: I click a button in my browser, and within about five seconds obtain the relevant output with \texttt{\textbackslash{}textcite\{abc1923\}} into my \LaTeX{} editor.
+
+You will need first to set up an environment in which to use \LaTeX{}. The simplest is \href{https://overleaf.com}{Overleaf}. Oxonians’ accounts are \href{https://www.overleaf.com/edu/oxford}{upgraded} for free. If you are sufficiently obsessive to outgrow Overleaf, you will not need to consult this guide. Once you have set up Overleaf, you can \href{https://www.overleaf.com/learn/how-to/How_to_link_Zotero_to_your_Overleaf_account}{set up} an integration with Zotero.
+
+This \href{https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes}{beginners' guide} is fairly helpful. Some further points.
+\begin{enumerate}
+\item One frustration is that \LaTeX{} and packages generate American dates. This can be rectified by including in the preamble \texttt{\textbackslash{}usepackage[british]\{babel\}}.
+\item You may want BibLaTeX to generate e.g. year-date citations or similar. This can be achieved with \texttt{\textbackslash{}usepackage[style=authoryear]\{biblatex\}}.
+\item The LaTeX Font[sic] \href{https://tug.org/FontCatalogue/}{Catalogue} includes sample code to change typeface.
+\item \textsc{llm}s are fairly good at generating \LaTeX{} code and debugging.
+\item For support for other languages, accents, and so on, the most straightforward option is to use XeLaTeX or LuaLaTeX, as explained \href{https://www.overleaf.com/blog/167-new-build-options-available-on-writelatex-compile-with-lualatex-or-latex-plus-dvipdf}{here}.
+\end{enumerate}
