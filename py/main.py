@@ -144,7 +144,7 @@ class Vignette(object):
                     shell=True,
                 ).wait()
         except OSError as e:
-            print(f"{name} to be generated for the first time.")
+            print(f"{name} to be (re)generated.")
             subprocess.Popen(
                 f"make4ht -ul --build-file {config.build_file} "
                 f"--output-dir {config.standalone_output} "
